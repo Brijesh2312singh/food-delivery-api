@@ -4,19 +4,28 @@ const router = express.Router();
 const { signup, login } = require("../controllers/authController");
 
 /**
+ * ======================
+ * AUTH TAG
+ * ======================
  * @swagger
  * tags:
  *   name: Auth
  *   description: Authentication APIs
  */
 
-
 /**
+ * ======================
+ * SIGNUP API
+ * ======================
  * @swagger
  * /api/auth/signup:
  *   post:
  *     summary: User Signup
  *     tags: [Auth]
+ *     consumes:
+ *       - application/json
+ *     produces:
+ *       - application/json
  *     requestBody:
  *       required: true
  *       content:
@@ -49,13 +58,19 @@ const { signup, login } = require("../controllers/authController");
  */
 router.post("/signup", signup);
 
-
 /**
+ * ======================
+ * LOGIN API
+ * ======================
  * @swagger
  * /api/auth/login:
  *   post:
  *     summary: User Login
  *     tags: [Auth]
+ *     consumes:
+ *       - application/json
+ *     produces:
+ *       - application/json
  *     requestBody:
  *       required: true
  *       content:
@@ -74,11 +89,10 @@ router.post("/signup", signup);
  *                 example: 123456
  *     responses:
  *       200:
- *         description: Login successful (JWT Token returned)
+ *         description: Login successful (JWT token returned)
  *       401:
  *         description: Invalid credentials
  */
 router.post("/login", login);
-
 
 module.exports = router;

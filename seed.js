@@ -1,3 +1,4 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 
 const Banner = require("./models/Banner");
@@ -5,7 +6,7 @@ const Category = require("./models/Category");
 const Restaurant = require("./models/Restaurant");
 const Food = require("./models/Food");
 
-mongoose.connect("mongodb+srv://admin:admin123@cluster0.vg2wkpw.mongodb.net/foodApp")
+mongoose.connect(process.env.MONGO_URI)
 .then(async () => {
 
     console.log("DB Connected");
@@ -15,7 +16,7 @@ mongoose.connect("mongodb+srv://admin:admin123@cluster0.vg2wkpw.mongodb.net/food
     await Restaurant.deleteMany();
     await Food.deleteMany();
 
-    // ================= BANNERS =================
+    // Banners
     const banners = [];
     for (let i = 1; i <= 10; i++) {
         banners.push({
@@ -24,56 +25,49 @@ mongoose.connect("mongodb+srv://admin:admin123@cluster0.vg2wkpw.mongodb.net/food
     }
     await Banner.insertMany(banners);
 
-    // ================= CATEGORIES =================
+    // Categories
     const categories = [
-        "Pizza", "Burger", "Biryani", "Chinese", "South Indian",
-        "North Indian", "Desserts", "Drinks", "Fast Food", "Snacks"
+        "Pizza","Burger","Biryani","Chinese","South Indian",
+        "North Indian","Desserts","Drinks","Fast Food","Snacks"
     ];
 
-    const categoryData = categories.map((name, index) => ({
+    const categoryData = categories.map((name, i) => ({
         name,
-        image: `https://picsum.photos/100?random=${index + 20}`
+        image: `https://picsum.photos/100?random=${i + 10}`
     }));
 
     await Category.insertMany(categoryData);
 
-    // ================= RESTAURANTS =================
-    const restaurantData = [];
-
-    for (let i = 1; i <= 20; i++) {
-        restaurantData.push({
-            name: `Restaurant ${i}`,
+    // Restaurants
+    const restaurants = await Restaurant.insertMany(
+        Array.from({ length: 20 }).map((_, i) => ({
+            name: `Restaurant ${i + 1}`,
             image: `https://picsum.photos/200?random=${i + 50}`,
-            rating: (Math.random() * 2 + 3).toFixed(1), // 3.0 - 5.0
+            rating: (Math.random() * 2 + 3).toFixed(1),
             deliveryTime: `${20 + i} mins`,
             category: categories[i % categories.length]
-        });
-    }
+        }))
+    );
 
-    const restaurants = await Restaurant.insertMany(restaurantData);
+    // Foods
+    const foodNames = ["Pizza","Burger","Biryani","Noodles","Dosa","Paneer","Ice Cream"];
 
-    // ================= FOODS =================
-    const foodNames = [
-        "Pizza", "Burger", "Biryani", "Noodles", "Dosa",
-        "Paneer Curry", "Ice Cream", "Cold Drink", "Sandwich", "Fries"
-    ];
-
-    const foodData = [];
+    const foods = [];
 
     for (let i = 1; i <= 40; i++) {
-        const randomRestaurant = restaurants[Math.floor(Math.random() * restaurants.length)];
+        const r = restaurants[Math.floor(Math.random() * restaurants.length)];
 
-        foodData.push({
+        foods.push({
             name: `${foodNames[i % foodNames.length]} ${i}`,
             price: Math.floor(Math.random() * 300) + 100,
             image: `https://picsum.photos/150?random=${i + 100}`,
-            restaurantId: randomRestaurant._id
+            restaurantId: r._id
         });
     }
 
-    await Food.insertMany(foodData);
+    await Food.insertMany(foods);
 
-    console.log("🔥 Bulk Data Inserted Successfully");
+    console.log("🔥 Seed Data Inserted");
     process.exit();
 
 })
