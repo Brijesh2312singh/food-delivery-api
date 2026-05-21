@@ -1,5 +1,7 @@
 const swaggerJsDoc = require("swagger-jsdoc");
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const options = {
     definition: {
         openapi: "3.0.0",
@@ -8,18 +10,29 @@ const options = {
             version: "1.0.0",
             description: "Food Delivery Backend APIs"
         },
-        servers: [
-            {
-                url: "http://localhost:3000"
-            },
-            {
-                url: "https://unarmored-dropper-blatantly.ngrok-free.dev"
-            }
-        ]
+
+        // 🔥 Dynamic server selection (DEV + PROD)
+        servers: isProduction
+            ? [
+                {
+                    url: "https://foodappapi.onrender.com",
+                    description: "Production Server"
+                }
+            ]
+            : [
+                {
+                    url: "http://localhost:3000",
+                    description: "Local Server"
+                },
+                {
+                    url: "https://your-ngrok-url.ngrok-free.app",
+                    description: "Ngrok Dev Server"
+                }
+            ]
     },
-    apis: ["./routes/*.js"] // routes se docs generate honge
+
+    // routes se swagger docs generate honge
+    apis: ["./routes/*.js"]
 };
 
-const swaggerSpec = swaggerJsDoc(options);
-
-module.exports = swaggerSpec;
+module.exports = swaggerJsDoc(options);
